@@ -366,8 +366,8 @@ const MapComponent = () => {
                         pointerEvents: 'all'
                     }
                 } >
-                Cancelar < /button> < /
-                div >
+                Cancelar < /button> <
+                /div>
             )
         } <
         />
