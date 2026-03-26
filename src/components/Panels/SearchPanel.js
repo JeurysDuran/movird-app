@@ -1,0 +1,226 @@
+// src/components/Panels/SearchPanel.js
+import React, { useState, useMemo } from 'react';
+import { useApp } from '../../context/AppContext';
+
+const SearchPanel = () => {
+    const { activePanel, closePanel, routes, vehicles, openPanel } = useApp();
+    const [query, setQuery] = useState('');
+
+    const isOpen = activePanel === 'search';
+
+    const filtered = useMemo(() => {
+        if (!query.trim()) return routes;
+        const q = query.toLowerCase();
+        return routes.filter(r =>
+            r.name.toLowerCase().includes(q) ||
+            r.type.toLowerCase().includes(q) ||
+            r.stops.some(s => s.name.toLowerCase().includes(q))
+        );
+    }, [query, routes]);
+
+    const handleSelect = (route) => {
+        window.dispatchEvent(new CustomEvent('selectRoute', { detail: route }));
+        closePanel();
+    };
+
+    const vehiclesOnRoute = (routeId) => vehicles.filter(v => v.routeId === routeId);
+
+    const typeTagClass = {
+        OMSA: 'tag-omsa',
+        Metro: 'tag-metro',
+        Concho: 'tag-concho',
+        Teleferico: 'tag-teleferico',
+        Motoconcho: 'tag-moto'
+    };
+
+    const occColors = { Vacio: '#00d4a0', Medio: '#ff9a3c', Lleno: '#ff3b5c' };
+
+    return ( <
+        >
+        <
+        div className = { `panel-overlay ${isOpen ? 'open' : ''}` }
+        onClick = { closePanel }
+        /> <
+        div className = { `panel glass ${isOpen ? 'open' : ''}` } >
+        <
+        div className = "panel-handle" / >
+        <
+        div className = "panel-header" >
+        <
+        span className = "panel-title" > 🔍Buscar rutas < /span> <
+        button className = "panel-close"
+        onClick = { closePanel } >
+        <
+        svg viewBox = "0 0 24 24"
+        fill = "none"
+        stroke = "currentColor"
+        strokeWidth = "2" > < line x1 = "18"
+        y1 = "6"
+        x2 = "6"
+        y2 = "18" / > < line x1 = "6"
+        y1 = "6"
+        x2 = "18"
+        y2 = "18" / > < /svg> <
+        /button> <
+        /div> <
+        div style = {
+            { padding: '10px 20px 0' } } >
+        <
+        div className = "input-wrap" >
+        <
+        svg viewBox = "0 0 24 24"
+        fill = "none"
+        stroke = "currentColor"
+        strokeWidth = "2" >
+        <
+        circle cx = "11"
+        cy = "11"
+        r = "8" / > < line x1 = "21"
+        y1 = "21"
+        x2 = "16.65"
+        y2 = "16.65" / >
+        <
+        /svg> <
+        input className = "input-field"
+        placeholder = "Busca por ruta, tipo o parada..."
+        value = { query }
+        onChange = { e => setQuery(e.target.value) }
+        autoFocus = { isOpen }
+        /> <
+        /div> <
+        /div> <
+        div className = "panel-body" > {
+            filtered.length === 0 && ( <
+                p style = {
+                    { color: 'var(--text2)', fontSize: 13, textAlign: 'center', marginTop: 24 } } >
+                No se encontraron rutas <
+                /p>
+            )
+        } {
+            filtered.map(route => {
+                const routeVehicles = vehiclesOnRoute(route.id);
+                const busiest = routeVehicles.length > 0 ?
+                    routeVehicles.sort((a, b) => {
+                        const order = { Lleno: 2, Medio: 1, Vacio: 0 };
+                        return (order[b.occupancy] || 0) - (order[a.occupancy] || 0);
+                    })[0] :
+                    null;
+
+                return ( <
+                    div key = { route.id }
+                    className = "card"
+                    style = {
+                        { cursor: 'pointer', marginBottom: 10 } }
+                    onClick = {
+                        () => handleSelect(route) } >
+                    <
+                    div style = {
+                        { display: 'flex', alignItems: 'flex-start', gap: 10 } } >
+                    <
+                    div style = {
+                        { flex: 1 } } >
+                    <
+                    div style = {
+                        { display: 'flex', alignItems: 'center', gap: 7, marginBottom: 5 } } >
+                    <
+                    span className = { `transport-tag ${typeTagClass[route.type] || 'tag-omsa'}` } > { route.type } < /span> <
+                    span style = {
+                        { fontSize: 13, fontWeight: 700 } } > { route.name } < /span> <
+                    /div>
+
+                    { /* Paradas */ } <
+                    div style = {
+                        { fontSize: 11, color: 'var(--text2)', marginBottom: 6 } } > { route.stops.map(s => s.name).join(' → ') } <
+                    /div>
+
+                    <
+                    div style = {
+                        { display: 'flex', alignItems: 'center', gap: 10 } } >
+                    <
+                    span style = {
+                        { color: 'var(--accent)', fontSize: 12, fontWeight: 700 } } > RD$ { route.price } < /span> <
+                    span style = {
+                        { color: 'var(--text2)', fontSize: 11 } } > { route.stops.length }
+                    paradas < /span> {
+                        routeVehicles.length > 0 && ( <
+                            span style = {
+                                { fontSize: 11, color: 'var(--text2)' } } > { routeVehicles.length }
+                            guagua { routeVehicles.length !== 1 ? 's' : '' } <
+                            /span>
+                        )
+                    } <
+                    /div> <
+                    /div>
+
+                    { /* Indicador ocupación general */ } {
+                        busiest && ( <
+                            div style = {
+                                {
+                                    flexShrink: 0,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    gap: 3
+                                }
+                            } >
+                            <
+                            span style = {
+                                {
+                                    fontSize: 10,
+                                    fontWeight: 700,
+                                    color: occColors[busiest.occupancy] || 'var(--text2)',
+                                    background: (occColors[busiest.occupancy] || '#8899bb') + '22',
+                                    padding: '2px 7px',
+                                    borderRadius: 100
+                                }
+                            } > { busiest.occupancy } < /span> <
+                            /div>
+                        )
+                    } <
+                    /div>
+
+                    { /* Vehículos activos en la ruta */ } {
+                        routeVehicles.length > 0 && ( <
+                            div style = {
+                                { display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' } } > {
+                                routeVehicles.map(v => ( <
+                                    span key = { v.id }
+                                    style = {
+                                        {
+                                            fontSize: 10,
+                                            fontWeight: 700,
+                                            background: 'var(--surface3)',
+                                            borderRadius: 6,
+                                            padding: '3px 7px',
+                                            color: occColors[v.occupancy] || 'var(--text2)'
+                                        }
+                                    } > { v.id }· { v.occupancy } <
+                                    /span>
+                                ))
+                            } <
+                            /div>
+                        )
+                    } <
+                    /div>
+                );
+            })
+        }
+
+        { /* CTA para montarse */ } {
+            routes.length > 0 && ( <
+                button onClick = {
+                    () => { closePanel();
+                        setTimeout(() => openPanel('boarding'), 100); } }
+                className = "btn btn-accent btn-block"
+                style = {
+                    { marginTop: 8 } } > 🚌Ver guaguas y montarme <
+                /button>
+            )
+        } <
+        /div> <
+        /div> <
+        />
+    );
+};
+
+export default SearchPanel;
