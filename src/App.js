@@ -17,6 +17,8 @@ import ReportsPanel from './components/Panels/ReportsPanel';
 import AdminPanel from './components/Panels/AdminPanel';
 import ProfilePanel from './components/Panels/ProfilePanel';
 import BoardingPanel from './components/Panels/BoardingPanel';
+import DriverPanel from './components/Panels/DriverPanel';
+import CobroPanel from './components/Panels/CobroPanel';
 
 const AppContent = () => {
     const { currentUser, loading, openPanel } = useApp();
@@ -42,48 +44,33 @@ const AppContent = () => {
     if (loading) return <LoadingScreen / > ;
     if (!currentUser) return <AuthScreen / > ;
 
-    return ( <
-        >
-        <
-        MapComponent / >
-        <
-        Navbar / >
-        <
-        BottomDock / >
-        <
-        FabStack / >
-        <
-        PanelOverlay / >
-        <
-        Toast / >
-        <
-        SearchPanel / >
-        <
-        RoutesPanel / >
-        <
-        PaymentPanel / >
-        <
-        SecurityPanel / >
-        <
-        ReportsPanel / >
-        <
-        AdminPanel / >
-        <
-        ProfilePanel / >
-        <
-        BoardingPanel / >
-        <
-        />
+    return (
+        <>
+            <MapComponent />
+            <Navbar />
+            <BottomDock />
+            <FabStack />
+            <PanelOverlay />
+            <Toast />
+            <SearchPanel />
+            <RoutesPanel />
+            <PaymentPanel />
+            <SecurityPanel />
+            <ReportsPanel />
+            <AdminPanel />
+            <ProfilePanel />
+            <BoardingPanel />
+            <DriverPanel />
+            <CobroPanel />
+        </>
     );
 };
 
 function App() {
-    return ( <
-        AppProvider >
-        <
-        AppContent / >
-        <
-        /AppProvider>
+    return (
+        <AppProvider>
+            <AppContent />
+        </AppProvider>
     );
 }
 

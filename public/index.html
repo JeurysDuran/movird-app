@@ -11,11 +11,17 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
     <style>
-        #map {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            background: #060d1a;
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            background: #f0ece6;
+        }
+        
+        .leaflet-container {
+            background: #f0ece6 !important;
         }
     </style>
 </head>
