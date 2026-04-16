@@ -59,6 +59,28 @@ function nearestStop(routes, lat, lng, maxKm) {
     return best;
 }
 
+window.__routeGeometryCache = window.__routeGeometryCache || {};
+
+async function fetchStreetGeometry(stops) {
+    if (!stops || stops.length < 2) return stops.map(function(s) { return [s.lat, s.lng]; });
+    var cacheKey = stops.map(function(s) { return s.lat.toFixed(4) + ',' + s.lng.toFixed(4); }).join('|');
+    if (window.__routeGeometryCache[cacheKey]) return window.__routeGeometryCache[cacheKey];
+    
+    try {
+        var coordsStr = stops.map(function(s) { return s.lng + ',' + s.lat; }).join(';');
+        var res = await fetch('https://router.project-osrm.org/route/v1/driving/' + coordsStr + '?overview=full&geometries=geojson');
+        if (!res.ok) throw new Error('OSRM fallback');
+        var data = await res.json();
+        if (data.routes && data.routes[0] && data.routes[0].geometry) {
+            var pts = data.routes[0].geometry.coordinates;
+            var mapped = pts.map(function(p) { return [p[1], p[0]]; });
+            window.__routeGeometryCache[cacheKey] = mapped;
+            return mapped;
+        }
+    } catch(e) { console.warn('OSRM fallback', e); }
+    return stops.map(function(s) { return [s.lat, s.lng]; });
+}
+
 var MapComponent = function() {
     var ctx = useApp();
     var vehicles = ctx.myVehicles || ctx.vehicles;
@@ -103,9 +125,20 @@ var MapComponent = function() {
 
         if (!routeList || !routeList.length) return;
 
-        routeList.forEach(function(route) {
+        routeList.forEach(async function(route) {
             if (!route.stops || route.stops.length < 2) return;
-            var coords = route.geometry || route.stops.map(function(s) { return [s.lat, s.lng]; });
+            
+            var coords;
+            if (route.geometry && route.geometry.length) {
+                coords = route.geometry;
+            } else if (route.type !== 'Metro' && route.type !== 'Teleferico') {
+                coords = await fetchStreetGeometry(route.stops);
+            } else {
+                coords = route.stops.map(function(s) { return [s.lat, s.lng]; });
+            }
+            
+            if (!map || !allRouteLinesRef.current) return;
+
             var lineColor = ROUTE_COLORS[route.type] || '#2a7fff';
 
             try {
@@ -120,8 +153,7 @@ var MapComponent = function() {
                 var line = window.L.polyline(coords, {
                     color: lineColor,
                     weight: route.type === 'Metro' ? 5 : 4,
-                    opacity: 0.8,
-                    dashArray: (route.type === 'Concho' || route.type === 'OMSA') ? '10,5' : null
+                    opacity: 0.8
                 }).addTo(map);
                 line.bindPopup(
                     '<div style="font-family:\'DM Sans\',sans-serif;padding:4px 0;min-width:160px;">' +
@@ -252,7 +284,7 @@ var MapComponent = function() {
                         stopData = near.stop;
                         displayName = near.stop.name;
                         placePlannerPin(map, near.stop.lat, near.stop.lng, 'origin', displayName, near);
-                        map.flyTo([near.stop.lat, near.stop.lng], map.getZoom(), { duration: 0.5 });
+                        map.setView([near.stop.lat, near.stop.lng], map.getZoom(), { animate: false });
                     } else {
                         // Ninguna parada cercana: usar coordenada libre
                         stopData = { name: 'Punto personalizado', lat: lat, lng: lng };
@@ -280,7 +312,7 @@ var MapComponent = function() {
                         stopData2 = near2.stop;
                         displayName2 = near2.stop.name;
                         placePlannerPin(map, near2.stop.lat, near2.stop.lng, 'dest', displayName2, near2);
-                        map.flyTo([near2.stop.lat, near2.stop.lng], map.getZoom(), { duration: 0.5 });
+                        map.setView([near2.stop.lat, near2.stop.lng], map.getZoom(), { animate: false });
                     } else {
                         stopData2 = { name: 'Punto personalizado', lat: lat, lng: lng };
                         displayName2 = 'Destino';
@@ -414,13 +446,13 @@ var MapComponent = function() {
 
         var onLocateMe = function() {
             if (userLocation && mapRef.current) {
-                mapRef.current.flyTo([userLocation.lat, userLocation.lng], 16, { duration: 1 });
+                mapRef.current.setView([userLocation.lat, userLocation.lng], 16, { animate: false });
             } else if (mapRef.current) {
                 mapRef.current.locate({ setView: true, maxZoom: 16 });
             }
         };
 
-        var onSelectRoute = function(e) {
+        var onSelectRoute = async function(e) {
             var route = e.detail;
             if (!mapRef.current || !route || !route.stops || !route.stops.length) return;
 
@@ -429,17 +461,33 @@ var MapComponent = function() {
             });
             routeLinesRef.current = [];
 
-            var coords = route.geometry || route.stops.map(function(s) { return [s.lat, s.lng]; });
+            var coords;
+            if (route.geometry && route.geometry.length) {
+                coords = route.geometry;
+            } else if (route.type !== 'Metro' && route.type !== 'Teleferico') {
+                coords = await fetchStreetGeometry(route.stops);
+            } else {
+                coords = route.stops.map(function(s) { return [s.lat, s.lng]; });
+            }
+            if (!mapRef.current) return;
+
             var lineColor = ROUTE_COLORS[route.type] || '#2a7fff';
 
-            mapRef.current.flyTo(coords[0], 14, { duration: 1.2 });
+            mapRef.current.setView(coords[0], 14, { animate: false });
 
             try {
+                var shadow = window.L.polyline(coords, {
+                    color: lineColor,
+                    weight: 12,
+                    opacity: 0.15,
+                    interactive: false
+                }).addTo(mapRef.current);
+                routeLinesRef.current.push(shadow);
+
                 var line = window.L.polyline(coords, {
                     color: lineColor,
-                    weight: 7,
-                    opacity: 1,
-                    dashArray: route.type === 'Metro' ? null : '12,5'
+                    weight: 6,
+                    opacity: 1
                 }).addTo(mapRef.current);
                 routeLinesRef.current.push(line);
 
@@ -483,7 +531,7 @@ var MapComponent = function() {
         var onFocusZone = function(e) {
             var zone = e.detail;
             if (mapRef.current && zone && zone.lat && zone.lng) {
-                mapRef.current.flyTo([zone.lat, zone.lng], 15, { duration: 1 });
+                mapRef.current.setView([zone.lat, zone.lng], 15, { animate: false });
                 
                 // Si viene como focusPlace, poner un pin temporal
                 if (pointedPlaceRef.current) {
@@ -504,7 +552,7 @@ var MapComponent = function() {
         var onFocusVehicle = function(e) {
             var v = e.detail;
             if (mapRef.current && v && v.lat && v.lng) {
-                mapRef.current.flyTo([v.lat, v.lng], 16, { duration: 1 });
+                mapRef.current.setView([v.lat, v.lng], 16, { animate: false });
             }
         };
 
@@ -537,7 +585,7 @@ var MapComponent = function() {
         };
 
         // Cuando el plan está listo: dibujar la ruta en el mapa
-        var onShowRoutePlan = function(e) {
+        var onShowRoutePlan = async function(e) {
             var plan = e.detail;
             if (!mapRef.current || !plan) return;
 
@@ -546,9 +594,19 @@ var MapComponent = function() {
             });
             routeLinesRef.current = [];
 
-            plan.legs.forEach(function(leg) {
-                var coords = (leg.route && leg.route.geometry) ? leg.route.geometry : leg.stops.map(function(s) { return [s.lat, s.lng]; });
-                var lineColor = ROUTE_COLORS[leg.route.type] || '#2a7fff';
+            for (var i = 0; i < plan.legs.length; i++) {
+                var leg = plan.legs[i];
+                var coords;
+                if (leg.route && leg.route.geometry && leg.route.geometry.length) {
+                    coords = leg.route.geometry;
+                } else if (leg.route && leg.route.type !== 'Metro' && leg.route.type !== 'Teleferico') {
+                    coords = await fetchStreetGeometry(leg.stops);
+                } else {
+                    coords = leg.stops.map(function(s) { return [s.lat, s.lng]; });
+                }
+                if (!mapRef.current) return;
+
+                var lineColor = ROUTE_COLORS[leg.route && leg.route.type ? leg.route.type : 'OMSA'] || '#2a7fff';
 
                 try {
                     // Sombra
@@ -564,8 +622,7 @@ var MapComponent = function() {
                     var line = window.L.polyline(coords, {
                         color: lineColor,
                         weight: 6,
-                        opacity: 1,
-                        dashArray: leg.route.type === 'Metro' ? null : '10,5'
+                        opacity: 1
                     }).addTo(mapRef.current);
                     routeLinesRef.current.push(line);
 
@@ -586,7 +643,7 @@ var MapComponent = function() {
                         routeLinesRef.current.push(sm);
                     });
                 } catch (err) {}
-            });
+            }
 
             // Fit bounds del plan completo
             try {
@@ -595,7 +652,7 @@ var MapComponent = function() {
                     leg.stops.forEach(function(s) { allCoords.push([s.lat, s.lng]); });
                 });
                 if (allCoords.length > 1) {
-                    mapRef.current.fitBounds(allCoords, { padding: [50, 50], duration: 1 });
+                    mapRef.current.fitBounds(allCoords, { padding: [50, 50], animate: false });
                 }
             } catch (err) {}
         };

@@ -8,9 +8,7 @@ const { Server } = require('socket.io');
 const app = express();
 const server = http.createServer(app);
 
-// Configurar Socket.io
-// backend/server.js
-// Triggering backend restarter
+// 🔥 Socket.io config (IMPORTANTE PARA RENDER)
 const io = new Server(server, {
   cors: { origin: '*', methods: ['GET', 'POST'] }
 });
@@ -19,41 +17,55 @@ const io = new Server(server, {
 app.use(cors());
 app.use(express.json());
 
-// Conexión MongoDB
-const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/movird';
+// 🔥 MongoDB Atlas (CORRECTO PARA RENDER)
+const mongoURI = process.env.MONGODB_URI;
+
+if (!mongoURI) {
+  console.error('❌ ERROR: MONGODB_URI no está definida en variables de entorno');
+  process.exit(1);
+}
+
 mongoose.connect(mongoURI)
-  .then(() => console.log('✅ MongoDB Conectado (MoviRD Atlas)'))
-  .catch(err => console.error('❌ Error MongoDB:', err));
+  .then(() => console.log('✅ MongoDB conectado correctamente'))
+  .catch(err => {
+    console.error('❌ Error conectando a MongoDB:', err);
+    process.exit(1);
+  });
 
-// Rutas base
+// Ruta base
 app.get('/', (req, res) => {
-  res.json({ message: 'MoviRD 2.0 Backend & Real-Time Engine Active' });
+  res.json({ message: 'MoviRD 2.0 Backend & Real-Time Engine Active 🚀' });
 });
-
-// Rutas Autenticación
+app.get('/test', (req, res) => {
+  res.send('Test route working');
+});
+// 🔥 Rutas API (asegúrate que estos archivos existan)
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/config', require('./routes/config'));
 app.use('/api/routes', require('./routes/routesApi'));
 
-// Cargar motor de simulación
+// 🔥 Motor de simulación
 const simulationEngine = require('./simulation/engine');
 
+// Usuarios activos
 const activeUsers = new Map();
 
-// Eventos de Socket.io (Motor de movilidad urbana y alertas en tiempo real)
+// 🔥 SOCKET.IO (tiempo real)
 io.on('connection', (socket) => {
   console.log('🔗 Cliente conectado: ' + socket.id);
 
-  // Enviarle estado actual de vehículos de inmediato
+  // Enviar estado actual
   socket.emit('vehicle_positions', simulationEngine.getGlobalVehicles());
 
-  // Conteo de usuarios viéndolo
   activeUsers.set(socket.id, Date.now());
 
-  // Driver Check-ins (Actualizaciones manuales)
+  // Driver updates
   socket.on('driver_update_position', (data) => {
-     // El chofer reportó llegada a siguiente parada!
-     simulationEngine.updateHumanDriverPosition(data.vehicleId, data.lat, data.lng);
+    simulationEngine.updateHumanDriverPosition(
+      data.vehicleId,
+      data.lat,
+      data.lng
+    );
   });
 
   socket.on('disconnect', () => {
@@ -62,13 +74,14 @@ io.on('connection', (socket) => {
   });
 });
 
-// Arrancar Engine de Simulación Global MoviRD
+// 🔥 Iniciar simulación
 simulationEngine.startEngine(io);
 
-// Iniciar aplicación
+// 🔥 Puerto (Render usa process.env.PORT)
 const PORT = process.env.PORT || 5000;
+
 server.listen(PORT, () => {
-  console.log(`🚀 Servidor en ejecución en puerto ${PORT}`);
+  console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
 });
 
 module.exports = { io };

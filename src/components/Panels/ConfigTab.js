@@ -8,7 +8,7 @@ export default function ConfigTab() {
 
     const fetchConfig = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/config');
+            const res = await fetch('https://movird-backend.onrender.com/');
             if(res.ok) {
                 const data = await res.json();
                 setConfig(data);
@@ -26,7 +26,7 @@ export default function ConfigTab() {
 
     const handleSave = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/config', {
+            const res = await fetch('https://movird-backend.onrender.com/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

@@ -12,7 +12,7 @@ if(!text.includes("io from 'socket.io-client'")) {
 
 const newSimString = `
     useEffect(() => {
-        const socket = io('http://localhost:5000');
+        const socket = io('https://movird-backend.onrender.com/');
         socket.on('connect', () => console.log('✅ Conectado al Engine MoviRD Central'));
         
         socket.on('vehicle_positions', (serverVehicles) => {
