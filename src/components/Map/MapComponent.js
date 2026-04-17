@@ -68,17 +68,22 @@ async function fetchStreetGeometry(stops) {
     
     try {
         var coordsStr = stops.map(function(s) { return s.lng + ',' + s.lat; }).join(';');
+        // Usar HTTPS en lugar de HTTP
         var res = await fetch('https://router.project-osrm.org/route/v1/driving/' + coordsStr + '?overview=full&geometries=geojson');
-        if (!res.ok) throw new Error('OSRM fallback');
+        if (!res.ok) throw new Error('OSRM HTTP error: ' + res.status);
         var data = await res.json();
-        if (data.routes && data.routes[0] && data.routes[0].geometry) {
+        if (data.code === 'Ok' && data.routes && data.routes[0] && data.routes[0].geometry) {
             var pts = data.routes[0].geometry.coordinates;
             var mapped = pts.map(function(p) { return [p[1], p[0]]; });
             window.__routeGeometryCache[cacheKey] = mapped;
             return mapped;
+        } else {
+            throw new Error('OSRM no retornó ruta válida: ' + (data.code || 'unknown'));
         }
-    } catch(e) { console.warn('OSRM fallback', e); }
-    return stops.map(function(s) { return [s.lat, s.lng]; });
+    } catch(e) { 
+        console.warn('OSRM error, usando fallback lineal:', e); 
+        return stops.map(function(s) { return [s.lat, s.lng]; });
+    }
 }
 
 var MapComponent = function() {

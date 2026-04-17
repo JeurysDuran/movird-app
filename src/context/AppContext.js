@@ -93,13 +93,14 @@ export const AppProvider = ({ children }) => {
                 }
                 try {
                     const coords = r.stops.map(s => `${s.lng},${s.lat}`).join(';');
-                    const url = `http://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`;
+                    const url = `https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`;
                     const res = await fetch(url);
+                    if (!res.ok) throw new Error('OSRM HTTP ' + res.status);
                     const data = await res.json();
-                    if(data.code === 'Ok' && data.routes[0]) {
+                    if(data.code === 'Ok' && data.routes && data.routes[0]) {
                         return {...r, geometry: data.routes[0].geometry.coordinates.map(c => [c[1], c[0]])};
                     }
-                } catch(e) {}
+                } catch(e) { console.warn('OSRM fetch error:', e); }
                 
                 return {...r, geometry: r.stops.map(s => [s.lat, s.lng])};
             }));
@@ -306,37 +307,48 @@ export const AppProvider = ({ children }) => {
 
         try {
             const coordsStr = newRoute.stops.map(s => `${s.lng},${s.lat}`).join(';');
-            const url = `http://router.project-osrm.org/route/v1/driving/${coordsStr}?overview=full&geometries=geojson`;
-            const res = await fetch(url);
-            const data = await res.json();
-            if (data.code === 'Ok' && data.routes[0]) {
-                 newRoute.geometry = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+            const url = `https://router.project-osrm.org/route/v1/driving/${coordsStr}?overview=full&geometries=geojson`;
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error('OSRM HTTP error');
+                const data = await res.json();
+                if (data.code === 'Ok' && data.routes && data.routes[0]) {
+                     newRoute.geometry = data.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+                } else {
+                    throw new Error('OSRM retornó: ' + (data.code || 'error desconocido'));
+                }
+            } catch(e) {
+                console.warn('Error obteniendo geometría OSRM, usando fallback:', e);
             }
-        } catch(e) {}
 
-        if (!newRoute.geometry) newRoute.geometry = newRoute.stops.map(s => [s.lat, s.lng]);
+            if (!newRoute.geometry) newRoute.geometry = newRoute.stops.map(s => [s.lat, s.lng]);
 
-        setRoutes(prev => [...prev, newRoute]);
+            setRoutes(prev => [...prev, newRoute]);
 
-        // Generar un vehiculo atado a esta ruta nueva
-        const pt = newRoute.geometry[0];
-        if (pt) {
-            setVehicles(prev => [...prev, {
-                id: 'V-' + (Math.floor(Math.random() * 9000) + 1000),
-                routeId: newRoute.id,
-                type: newRoute.type,
-                occupancy: 'Vacio',
-                lat: pt[0],
-                lng: pt[1],
-                passengers: [],
-                _targetGeoIdx: 1,
-                _forward: true,
-                sindicatoId: newRoute.sindicatoId,
-            }]);
+            // Generar un vehiculo atado a esta ruta nueva
+            const pt = newRoute.geometry[0];
+            if (pt) {
+                setVehicles(prev => [...prev, {
+                    id: 'V-' + (Math.floor(Math.random() * 9000) + 1000),
+                    routeId: newRoute.id,
+                    type: newRoute.type,
+                    occupancy: 'Vacio',
+                    lat: pt[0],
+                    lng: pt[1],
+                    passengers: [],
+                    _targetGeoIdx: 1,
+                    _forward: true,
+                    sindicatoId: newRoute.sindicatoId,
+                }]);
+            }
+
+            showToast('Ruta "' + newRoute.name + '" inyectada al mapa', 'accent');
+            return newRoute;
+        } catch (e) {
+            console.error('Error al crear ruta:', e);
+            showToast('Error al crear la ruta', 'danger');
+            return null;
         }
-
-        showToast('Ruta "' + newRoute.name + '" inyectada al mapa', 'accent');
-        return newRoute;
     }, [currentUser, routes, showToast]);
 
     const deleteRoute = useCallback((routeId) => {

@@ -14,8 +14,8 @@ exports.getRouteGeometry = async (stops, type) => {
         // Formato para OSRM: lon,lat;lon,lat;...
         const coordinatesStr = stops.map(s => `${s.lng},${s.lat}`).join(';');
         
-        // Pedirle la ruta a OSRM
-        const url = `http://router.project-osrm.org/route/v1/driving/${coordinatesStr}?overview=full&geometries=geojson`;
+        // Pedirle la ruta a OSRM (HTTPS para compatibilidad con Netlify/producción)
+        const url = `https://router.project-osrm.org/route/v1/driving/${coordinatesStr}?overview=full&geometries=geojson`;
         
         const response = await fetch(url);
         const data = await response.json();
