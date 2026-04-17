@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import { TRANSPORT_TYPES } from '../../data/mockData';
+import { MdLocationOn, MdSearch } from 'react-icons/md';
 
 const TABS = ['Choferes', 'Rutas', 'Vehículos'];
 
@@ -289,7 +290,7 @@ const AdminPanel = () => {
                                             <span style={{ color: 'var(--text2)', fontSize: 10 }}>{s.lat?.toFixed(4)}, {s.lng?.toFixed(4)}</span>
                                             <button onClick={() => {
                                                 window.dispatchEvent(new CustomEvent('focusZone', { detail: { lat: s.lat, lng: s.lng } }));
-                                            }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: 'var(--blue)', padding: '2px 4px' }}>📍</button>
+                                            }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 12, color: 'var(--blue)', padding: '2px 4px' }}><MdLocationOn /></button>
                                             <button onClick={() => setNewRoute(r => ({ ...r, stops: r.stops.filter((_, idx) => idx !== i) }))}
                                                 style={{ background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: 14 }}>✕</button>
                                         </div>
@@ -301,7 +302,7 @@ const AdminPanel = () => {
                             <div style={{ position: 'relative', marginBottom: 6 }}>
                                 <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                                     <div style={{ flex: 1, position: 'relative' }}>
-                                        <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', opacity: 0.5, fontSize: 14 }}>🔍</span>
+                                        <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', opacity: 0.5, fontSize: 14 }}><MdSearch style={{display: 'inline'}} /></span>
                                         <input
                                             style={{ ...inp, paddingLeft: 32, marginBottom: 0 }}
                                             placeholder="Buscar parada (ej: Malecón, UASD...)"
@@ -333,7 +334,7 @@ const AdminPanel = () => {
                                                 onMouseEnter={e => e.currentTarget.style.background = 'var(--surface2)'}
                                                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                                             >
-                                                <span style={{ fontSize: 16, flexShrink: 0 }}>📍</span>
+                                                <span style={{ fontSize: 16, flexShrink: 0 }}><MdLocationOn /></span>
                                                 <div>
                                                     <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>
                                                         {place.display_name.split(',')[0]}
@@ -369,7 +370,7 @@ const AdminPanel = () => {
                                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
                                             <span style={{ fontWeight: 700, fontSize: 13 }}>{r.name}</span>
                                             <div style={{ display: 'flex', gap: 6 }}>
-                                                <button onClick={() => handleShowOnMap(r)} className="btn btn-ghost" style={{ padding: '4px 8px', fontSize: 11 }}>🗺 Ver</button>
+                                                <button onClick={() => handleShowOnMap(r)} className="btn btn-ghost" style={{ padding: '4px 8px', fontSize: 11 }}>Ver Mapa</button>
                                                 <button onClick={() => handleDeleteRoute(r.id)} className="btn btn-danger" style={{ padding: '4px 8px', fontSize: 11 }}>✕</button>
                                             </div>
                                         </div>
@@ -384,7 +385,7 @@ const AdminPanel = () => {
                                         {/* Asignar chofer a vehículo de esta ruta */}
                                         {routeVehicles.map(v => (
                                             <div key={v.id} style={{ display: 'flex', gap: 6, alignItems: 'center', paddingTop: 8, borderTop: '1px solid var(--border)' }}>
-                                                <span style={{ fontSize: 11, color: 'var(--text2)', flex: 1 }}>🚌 {v.id}</span>
+                                                <span style={{ fontSize: 11, color: 'var(--text2)', flex: 1 }}>Vehículo {v.id}</span>
                                                 <select
                                                     value={v.driverEmail || ''}
                                                     onChange={e => handleAssignDriverToRoute(v.id, e.target.value)}
@@ -431,12 +432,12 @@ const AdminPanel = () => {
                                             <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 100, background: occColor + '22', color: occColor, fontWeight: 700 }}>{v.occupancy}</span>
                                             <span style={{ flex: 1, fontSize: 11, color: 'var(--text2)' }}>{v.type}</span>
                                             <button onClick={() => { if (v.lat && v.lng) { window.dispatchEvent(new CustomEvent('focusVehicle', { detail: v })); closePanel(); } else showToast('Sin GPS aún', 'warn'); }}
-                                                className="btn btn-ghost" style={{ padding: '3px 7px', fontSize: 11 }}>📍</button>
+                                                className="btn btn-ghost" style={{ padding: '3px 7px', fontSize: 11 }}><MdLocationOn /></button>
                                             <button onClick={() => { if (window.confirm(`¿Eliminar ${v.id}?`)) deleteVehicle(v.id); }}
                                                 className="btn btn-danger" style={{ padding: '3px 7px', fontSize: 11 }}>✕</button>
                                         </div>
                                         <div style={{ fontSize: 11, color: 'var(--text2)', marginTop: 6 }}>
-                                            {driver ? `👤 ${driver.name}` : '👤 Sin chofer'} · {route ? route.name : 'Sin ruta'} · {v.passengers?.length || 0} a bordo
+                                            {driver ? `Chofer: ${driver.name}` : 'Chofer: Sin asignar'} · {route ? route.name : 'Sin ruta'} · {v.passengers?.length || 0} a bordo
                                         </div>
                                         {/* Asignar chofer inline */}
                                         <div style={{ marginTop: 8 }}>

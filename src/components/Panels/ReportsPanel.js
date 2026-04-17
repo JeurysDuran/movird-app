@@ -2,17 +2,18 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
 import Card from '../Common/Card';
+import { MdDirectionsCar, MdWarning, MdGroup, MdDirectionsTransit, MdLocalPolice, MdAttachMoney, MdConstruction } from 'react-icons/md';
 
 const REPORT_TYPES = [
-    { id: 'traffic', label: 'Tapón', icon: '🚗' },
-    { id: 'accident', label: 'Accidente', icon: '💥' },
-    { id: 'strike', label: 'Huelga', icon: '✊' },
-    { id: 'closed', label: 'Ruta cerrada', icon: '🚧' },
-    { id: 'police', label: 'Policía', icon: '👮' },
-    { id: 'price', label: 'Precio alto', icon: '💰' },
-    { id: 'nopass', label: 'No paró', icon: '🚌' },
-    { id: 'theft', label: 'Robo', icon: '⚠️' },
-    { id: 'empty', label: 'Poca gente', icon: '👥' }
+    { id: 'traffic', label: 'Tapón', icon: <MdDirectionsCar /> },
+    { id: 'accident', label: 'Accidente', icon: <MdWarning /> },
+    { id: 'strike', label: 'Huelga', icon: <MdConstruction /> },
+    { id: 'closed', label: 'Ruta cerrada', icon: <MdConstruction /> },
+    { id: 'police', label: 'Policía', icon: <MdLocalPolice /> },
+    { id: 'price', label: 'Precio alto', icon: <MdAttachMoney /> },
+    { id: 'nopass', label: 'No paró', icon: <MdDirectionsTransit /> },
+    { id: 'theft', label: 'Robo', icon: <MdWarning /> },
+    { id: 'empty', label: 'Poca gente', icon: <MdGroup /> }
 ];
 
 const ReportsPanel = () => {
@@ -27,7 +28,7 @@ const ReportsPanel = () => {
     const getReportIcon = (typeId) => {
         const type = REPORT_TYPES.find(t => t.id === typeId);
         // Reemplazar optional chaining con verificación tradicional
-        return type ? type.icon : '📢';
+        return type ? type.icon : <MdWarning />;
     };
 
     return ( <

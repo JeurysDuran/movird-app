@@ -1,6 +1,7 @@
 // src/components/Panels/RoutesPanel.js
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
+import { MdLocationOn, MdCheckCircle, MdMap, MdWarning, MdSearch, MdDirectionsTransit, MdFlag } from 'react-icons/md';
 
 var ROUTE_COLORS = {
     'Metro': '#00b4d8',
@@ -318,7 +319,7 @@ function BrowseTab(props) {
                         { textAlign: 'center', padding: '40px 20px', color: 'var(--text2)' } } >
                     <
                     div style = {
-                        { fontSize: 36, marginBottom: 12 } } > 🗺 < /div> <
+                        { fontSize: 36, marginBottom: 12 } } > <MdMap style={{fontSize: 36}} /> < /div> <
                     div style = {
                         { fontWeight: 700, fontSize: 15, marginBottom: 6 } } > { routes.length === 0 ? 'Sin rutas disponibles' : 'Sin rutas de este tipo' } <
                     /div> <
@@ -366,11 +367,11 @@ function BrowseTab(props) {
                                     {
                                         stopNames.length > 0 && ( <
                                             div style = {
-                                                { fontSize: 11, color: 'var(--text2)', marginBottom: 10, lineHeight: 1.5 } } > 📍{ stopNames[0] } {
+                                                { fontSize: 11, color: 'var(--text2)', marginBottom: 10, lineHeight: 1.5 } } > <MdLocationOn style={{display: 'inline', marginRight: 4}} />{ stopNames[0] } {
                                                 stopNames.length > 2 && < span style = {
                                                     { opacity: .6 } } > ···{ stopNames.length - 2 }
                                                 paradas < /span>} {
-                                                    stopNames.length > 1 && < span > →🏁{ stopNames[stopNames.length - 1] } < /span>} <
+                                                    stopNames.length > 1 && < span > →<span style={{color: 'var(--accent)'}}></span>{ stopNames[stopNames.length - 1] } < /span>} <
                                                         /div>
                                                 )
                                             }
@@ -517,7 +518,7 @@ function BrowseTab(props) {
                         } >
                         <
                         span style = {
-                            { fontSize: 18 } } > 📍 < /span> <
+                            { fontSize: 18 } } > <MdLocationOn /> < /span> <
                         div style = {
                             { flex: 1 } } >
                         <
@@ -532,7 +533,7 @@ function BrowseTab(props) {
                         } <
                         /div> <
                         span style = {
-                            { fontSize: 10, fontWeight: 700, padding: '3px 8px', background: origin ? '#00d4a033' : 'var(--surface3)', color: origin ? '#00d4a0' : 'var(--text2)', borderRadius: 100 } } > { origin ? '✓' : '🗺' } <
+                            { fontSize: 10, fontWeight: 700, padding: '3px 8px', background: origin ? '#00d4a033' : 'var(--surface3)', color: origin ? '#00d4a0' : 'var(--text2)', borderRadius: 100 } } > { origin ? <MdCheckCircle style={{display: 'inline'}} /> : <MdMap style={{display: 'inline'}} /> } <
                         /span> <
                         /button>
 
@@ -571,7 +572,7 @@ function BrowseTab(props) {
                         } >
                         <
                         span style = {
-                            { fontSize: 18 } } > 🏁 < /span> <
+                            { fontSize: 18 } } > <MdFlag /> < /span> <
                         div style = {
                             { flex: 1 } } >
                         <
@@ -586,7 +587,7 @@ function BrowseTab(props) {
                         } <
                         /div> <
                         span style = {
-                            { fontSize: 10, fontWeight: 700, padding: '3px 8px', background: dest ? '#ff3b5c33' : 'var(--surface3)', color: dest ? '#ff3b5c' : 'var(--text2)', borderRadius: 100 } } > { dest ? '✓' : '🗺' } <
+                            { fontSize: 10, fontWeight: 700, padding: '3px 8px', background: dest ? '#ff3b5c33' : 'var(--surface3)', color: dest ? '#ff3b5c' : 'var(--text2)', borderRadius: 100 } } > { dest ? <MdCheckCircle style={{display: 'inline'}} /> : <MdMap style={{display: 'inline'}} /> } <
                         /span> <
                         /button> <
                         /div>
@@ -594,7 +595,7 @@ function BrowseTab(props) {
                         { /* Error */ } {
                             error && ( <
                                 div style = {
-                                    { background: '#ff3b5c22', border: '1px solid #ff3b5c55', borderRadius: 10, padding: '8px 12px', fontSize: 12, color: '#ff3b5c', marginBottom: 10 } } > ⚠️{ error } <
+                                    { background: '#ff3b5c22', border: '1px solid #ff3b5c55', borderRadius: 10, padding: '8px 12px', fontSize: 12, color: '#ff3b5c', marginBottom: 10 } } > <MdWarning style={{display: 'inline', marginRight: 4}} />{ error } <
                                 /div>
                             )
                         }
@@ -622,7 +623,7 @@ function BrowseTab(props) {
                         { /* Loading */ } {
                             loading && ( <
                                 div style = {
-                                    { textAlign: 'center', padding: '20px', color: 'var(--text2)', fontSize: 13 } } > 🔍Buscando rutas... <
+                                    { textAlign: 'center', padding: '20px', color: 'var(--text2)', fontSize: 13 } } > <MdSearch style={{display: 'inline', marginRight: 4}} />Buscando rutas... <
                                 /div>
                             )
                         }
@@ -672,7 +673,7 @@ function BrowseTab(props) {
                                     { textAlign: 'center', padding: '28px 16px', color: 'var(--text2)', fontSize: 12, lineHeight: 1.8 } } >
                                 <
                                 div style = {
-                                    { fontSize: 40, marginBottom: 12 } } > 🗺 < /div> <
+                                    { fontSize: 40, marginBottom: 12 } } > <MdMap style={{fontSize: 40}} /> < /div> <
                                 div style = {
                                     { fontWeight: 700, fontSize: 14, color: 'var(--text)', marginBottom: 6 } } > ¿A dónde vas ? < /div> <
                                 div > Toca los botones de arriba para < br / > marcar origen y destino en el mapa. < /div> <
@@ -699,8 +700,8 @@ function BrowseTab(props) {
                     if (!isOpen) return null;
 
                     var TABS = [
-                        { id: 'browse', label: '🗺 Rutas' },
-                        { id: 'planner', label: '🧭 Planificar' }
+                        { id: 'browse', label: <><MdDirectionsTransit /> Rutas</> },
+                        { id: 'planner', label: <><MdMap /> Planificar</> }
                     ];
 
                     return ( <
@@ -717,7 +718,7 @@ function BrowseTab(props) {
                         <
                         div className = "panel-header" >
                         <
-                        span className = "panel-title" > 🗺Rutas de transporte < /span> <
+                        span className = "panel-title" > <MdDirectionsTransit /> Rutas de transporte < /span> <
                         button className = "panel-close"
                         onClick = { closePanel } >
                         <

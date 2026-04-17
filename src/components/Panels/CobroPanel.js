@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import QRCode from 'qrcode';
 import { useApp } from '../../context/AppContext';
+import { MdAttachMoney } from 'react-icons/md';
 
 const CobroPanel = () => {
     const { activePanel, closePanel, currentUser, driverCode, routes, vehicles, showToast, users } = useApp();
@@ -47,7 +48,7 @@ const CobroPanel = () => {
             <div className={`panel glass ${isOpen ? 'open' : ''}`}>
                 <div className="panel-handle" />
                 <div className="panel-header">
-                    <span className="panel-title">💰 Panel de Cobro</span>
+                    <span className="panel-title"><MdAttachMoney /> Panel de Cobro</span>
                     <button className="panel-close" onClick={closePanel}>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
                     </button>

@@ -1,6 +1,7 @@
 // src/components/Panels/SearchPanel.js
 import React, { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
+import { MdLocationOn, MdSearch, MdDirectionsTransit, MdMap } from 'react-icons/md';
 
 const SearchPanel = () => {
     const { activePanel, closePanel, routes, vehicles, openPanel, haversine } = useApp();
@@ -99,7 +100,7 @@ const SearchPanel = () => {
             <div className={`panel glass ${isOpen ? 'open' : ''}`}>
                 <div className="panel-handle" />
                 <div className="panel-header">
-                    <span className="panel-title">🚌 Rutas de Transporte</span>
+                    <span className="panel-title"><MdDirectionsTransit /> Rutas de Transporte</span>
                     <button className="panel-close" onClick={closePanel}>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <line x1="18" y1="6" x2="6" y2="18" />
@@ -135,7 +136,7 @@ const SearchPanel = () => {
                             {!searchingPlaces && places.map(place => (
                                 <div key={place.place_id} className="card" style={{ cursor: 'pointer', marginBottom: 8, padding: '10px 14px' }} onClick={() => handleSelectPlace(place)}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                        <div style={{ fontSize: 20 }}>📍</div>
+                                        <div style={{ fontSize: 20 }}><MdLocationOn /></div>
                                         <div>
                                             <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)' }}>
                                                 {place.display_name.split(',')[0]}
@@ -229,14 +230,14 @@ const SearchPanel = () => {
                         <div style={{ textAlign: 'center', marginTop: 32, padding: '0 20px' }}>
                             {query.trim() ? (
                                 <>
-                                    <div style={{ fontSize: 32, marginBottom: 10 }}>🔍</div>
+                                    <div style={{ fontSize: 32, marginBottom: 10 }}><MdSearch /></div>
                                     <p style={{ color: 'var(--text2)', fontSize: 13 }}>
                                         No se encontraron resultados para <strong style={{ color: 'var(--text)' }}>"{query}"</strong>
                                     </p>
                                 </>
                             ) : routes.length === 0 ? (
                                 <>
-                                    <div style={{ fontSize: 40, marginBottom: 12 }}>🚌</div>
+                                    <div style={{ fontSize: 40, marginBottom: 12 }}><MdDirectionsTransit /></div>
                                     <p style={{ color: 'var(--text)', fontSize: 15, fontWeight: 700, marginBottom: 6 }}>No hay rutas disponibles aún</p>
                                     <p style={{ color: 'var(--text2)', fontSize: 12, lineHeight: 1.5 }}>
                                         El administrador aún no ha creado rutas de transporte. Cuando las cree, aparecerán aquí.
@@ -244,7 +245,7 @@ const SearchPanel = () => {
                                 </>
                             ) : (
                                 <>
-                                    <div style={{ fontSize: 32, marginBottom: 10 }}>🗺️</div>
+                                    <div style={{ fontSize: 32, marginBottom: 10 }}><MdMap /></div>
                                     <p style={{ color: 'var(--text2)', fontSize: 13 }}>
                                         Escribe el nombre de una ruta o lugar para buscar
                                     </p>
@@ -255,7 +256,7 @@ const SearchPanel = () => {
 
                     {routes.length > 0 && !query.trim() && (
                         <button onClick={() => { closePanel(); setTimeout(() => openPanel('boarding'), 100); }} className="btn btn-accent btn-block" style={{ marginTop: 8 }}>
-                            🚌 Montarme en una ruta
+                            <MdDirectionsTransit style={{marginRight: 8, verticalAlign: 'middle'}} /> Montarme en una ruta
                         </button>
                     )}
                 </div>

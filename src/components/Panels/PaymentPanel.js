@@ -1,13 +1,15 @@
 // src/components/Panels/PaymentPanel.js
 import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
+import { MdAccountBalance, MdCreditCard, MdPayments, MdTrendingDown } from 'react-icons/md';
+import { FaApple } from 'react-icons/fa';
 
 const RECHARGE_METHODS = [
-    { id: 'transfer', label: 'Transferencia Bancaria', icon: '🏦', info: 'Transfiere a: BanReservas · Cta: 1234-5678-90\nConcept: Tu email de MoviRD' },
-    { id: 'paypal', label: 'PayPal', icon: '🅿️', info: 'Envía a: pagos@movird.app\nIncluye tu email como referencia' },
-    { id: 'googlepay', label: 'Google Pay', icon: '🔵', info: 'Número de teléfono: +1 809 000 0000\nIncluye tu email como referencia' },
-    { id: 'applepay', label: 'Apple Pay', icon: '🍎', info: 'Disponible próximamente desde la app iOS de MoviRD' },
-    { id: 'card', label: 'Tarjeta de Crédito/Débito', icon: '💳', info: 'Próximamente disponible directamente en la app' },
+    { id: 'transfer', label: 'Transferencia Bancaria', icon: <MdAccountBalance />, info: 'Transfiere a: BanReservas · Cta: 1234-5678-90\nConcept: Tu email de MoviRD' },
+    { id: 'paypal', label: 'PayPal', icon: <MdPayments />, info: 'Envía a: pagos@movird.app\nIncluye tu email como referencia' },
+    { id: 'googlepay', label: 'Google Pay', icon: <MdPayments />, info: 'Número de teléfono: +1 809 000 0000\nIncluye tu email como referencia' },
+    { id: 'applepay', label: 'Apple Pay', icon: <FaApple />, info: 'Disponible próximamente desde la app iOS de MoviRD' },
+    { id: 'card', label: 'Tarjeta de Crédito/Débito', icon: <MdCreditCard />, info: 'Próximamente disponible directamente en la app' },
 ];
 
 const PaymentPanel = () => {
@@ -132,7 +134,7 @@ const PaymentPanel = () => {
             <div className={`panel glass ${isOpen ? 'open' : ''}`}>
                 <div className="panel-handle" />
                 <div className="panel-header">
-                    <span className="panel-title">💳 Pagos</span>
+                    <span className="panel-title"><MdCreditCard style={{marginRight: 8, fontSize: 20, verticalAlign: 'middle'}} /> Pagos</span>
                     <button className="panel-close" onClick={closePanel}>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
                     </button>
@@ -257,7 +259,7 @@ const PaymentPanel = () => {
                                 </div>
                             ) : userTransactions.map(t => (
                                 <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: '1px solid var(--border)' }}>
-                                    <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'var(--danger-dim)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}>💸</div>
+                                    <div style={{ width: 38, height: 38, borderRadius: '50%', background: 'var(--danger-dim)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, flexShrink: 0 }}><MdTrendingDown /></div>
                                     <div style={{ flex: 1 }}>
                                         <div style={{ fontWeight: 600, fontSize: 13 }}>{t.type}</div>
                                         <div style={{ fontSize: 11, color: 'var(--text2)', marginTop: 2 }}>{t.driver} · {t.time}</div>

@@ -1,23 +1,24 @@
 // src/components/Panels/SecurityPanel.js
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { MdWarning, MdDirectionsCar, MdPersonOff, MdAttachMoney, MdBlock, MdNotes, MdReportProblem, MdBuild, MdEmergencyRecording } from 'react-icons/md';
 
 const PASSENGER_INCIDENT_TYPES = [
-    { id: 'theft', label: 'Robo / Asalto', icon: '⚠️' },
-    { id: 'accident', label: 'Accidente', icon: '💥' },
-    { id: 'harassment', label: 'Acoso', icon: '🚫' },
-    { id: 'traffic', label: 'Tapón grave', icon: '🚗' },
-    { id: 'overcharge', label: 'Cobro excesivo', icon: '💸' },
-    { id: 'notstop', label: 'Chofer no paró', icon: '🛑' },
+    { id: 'theft', label: 'Robo / Asalto', icon: <MdWarning /> },
+    { id: 'accident', label: 'Accidente', icon: <MdWarning /> },
+    { id: 'harassment', label: 'Acoso', icon: <MdBlock /> },
+    { id: 'traffic', label: 'Tapón grave', icon: <MdDirectionsCar /> },
+    { id: 'overcharge', label: 'Cobro excesivo', icon: <MdAttachMoney /> },
+    { id: 'notstop', label: 'Chofer no paró', icon: <MdBlock /> },
 ];
 
 const DRIVER_REPORT_TYPES = [
-    { id: 'aggressive', label: 'Pasajero agresivo', icon: '😠' },
-    { id: 'nopay', label: 'No pagó el pasaje', icon: '💸' },
-    { id: 'vandalism', label: 'Daños al vehículo', icon: '🔨' },
-    { id: 'drugs', label: 'Sospecha de drogas', icon: '🚨' },
-    { id: 'weapon', label: 'Portación de arma', icon: '⚠️' },
-    { id: 'other', label: 'Otro incidente', icon: '📋' },
+    { id: 'aggressive', label: 'Pasajero agresivo', icon: <MdReportProblem /> },
+    { id: 'nopay', label: 'No pagó el pasaje', icon: <MdAttachMoney /> },
+    { id: 'vandalism', label: 'Daños al vehículo', icon: <MdBuild /> },
+    { id: 'drugs', label: 'Sospecha de drogas', icon: <MdEmergencyRecording /> },
+    { id: 'weapon', label: 'Portación de arma', icon: <MdWarning /> },
+    { id: 'other', label: 'Otro incidente', icon: <MdNotes /> },
 ];
 
 const SecurityPanel = () => {
@@ -40,8 +41,8 @@ const SecurityPanel = () => {
     };
 
     const handleEmergency = () => {
-        addReport('emergency', '🚨 EMERGENCIA activada', null, null);
-        alert('🚨 EMERGENCIA ACTIVADA\n\nSe ha notificado a las autoridades.\nPermanece en un lugar seguro.');
+        addReport('emergency', 'EMERGENCIA activada', null, null);
+        alert('EMERGENCIA ACTIVADA\n\nSe ha notificado a las autoridades.\nPermanece en un lugar seguro.');
     };
 
     const getRiskColor = (risk) => ({ Alto: '#ff3b5c', Medio: '#ff9a3c', Bajo: '#00d4a0' }[risk] || '#888');
@@ -142,7 +143,7 @@ const SecurityPanel = () => {
                                         <>
                                             <textarea rows={2} placeholder="Describe brevemente lo ocurrido..." value={incidentNote} onChange={e => setIncidentNote(e.target.value)} style={inputStyle} />
                                             <button onClick={handleSubmitReport} style={{ width: '100%', padding: '12px', borderRadius: 10, border: 'none', background: 'var(--danger)', color: 'white', fontWeight: 700, fontFamily: 'var(--font)', fontSize: 14, cursor: 'pointer', marginTop: 10 }}>
-                                                🚨 Enviar Reporte de Pasajero
+                                                <MdEmergencyRecording style={{display: 'inline', marginRight: 6}} /> Enviar Reporte de Pasajero
                                             </button>
                                         </>
                                     )}
@@ -161,7 +162,7 @@ const SecurityPanel = () => {
                                 <div style={{ textAlign: 'center', padding: 30, color: 'var(--text2)', fontSize: 14 }}>Sin reportes registrados</div>
                             ) : allReports.map(r => (
                                 <div key={r.id} style={{ padding: '12px 0', borderBottom: '1px solid var(--border)', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                                    <div style={{ fontSize: 20, marginTop: 2 }}>{r.typeId === 'emergency' ? '🚨' : '⚠️'}</div>
+                                    <div style={{ fontSize: 20, marginTop: 2 }}>{r.typeId === 'emergency' ? <MdEmergencyRecording /> : <MdWarning />}</div>
                                     <div style={{ flex: 1 }}>
                                         <div style={{ fontWeight: 600, fontSize: 13 }}>{r.label}</div>
                                         <div style={{ fontSize: 11, color: 'var(--text2)', marginTop: 2 }}>Por: {r.user} · {r.time}</div>

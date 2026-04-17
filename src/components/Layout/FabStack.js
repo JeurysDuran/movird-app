@@ -6,7 +6,7 @@ const FabStack = () => {
     const { openPanel } = useApp();
 
     const triggerEmergency = () => {
-        alert('🚨 EMERGENCIA ACTIVADA 🚨\n\nSe ha notificado a tus contactos de emergencia y a las autoridades.\nPermanece en el lugar si es seguro.');
+        alert('⚠ EMERGENCIA ACTIVADA ⚠\n\nSe ha notificado a tus contactos de emergencia y a las autoridades.\nPermanece en el lugar si es seguro.');
     };
 
     const locateMe = () => {

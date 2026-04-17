@@ -189,7 +189,7 @@ var MapComponent = function() {
     var placePlannerPin = function(map, lat, lng, type, label, nearStop) {
         var isOrigin = type === 'origin';
         var color = isOrigin ? '#00d4a0' : '#ff3b5c';
-        var emoji = isOrigin ? '📍' : '🏁';
+        var emoji = isOrigin ? '●' : '◆'; // Replaced emoji with symbols
 
         // Quitar pin anterior del mismo tipo
         if (plannerPinsRef.current[type]) {
@@ -394,7 +394,7 @@ var MapComponent = function() {
         (vehicles || []).forEach(function(v) {
             if (!v.lat || !v.lng) return;
             var vColor = OCCUPANCY_COLORS[v.occupancy] || '#8899bb';
-            var vIcon = TYPE_ICONS[v.type] || '🚌';
+            var vIcon = TYPE_ICONS[v.type] || DEFAULT_ICON;
             try {
                 var divIcon = window.L.divIcon({
                     className: '',
@@ -407,8 +407,8 @@ var MapComponent = function() {
                     .bindPopup(
                         '<div style="font-family:\'DM Sans\',sans-serif;padding:4px 0;">' +
                         '<div style="font-weight:800;font-size:13px;margin-bottom:4px;">' + vIcon + ' ' + (v.type || '') + ' ' + (v.id || '') + '</div>' +
-                        '<div style="font-size:12px;color:#555;">👤 ' + (v.driver || 'Sin chofer') + '</div>' +
-                        '<div style="font-size:12px;color:' + vColor + ';font-weight:700;">● ' + (v.occupancy || '') + '</div>' +
+                        '<div style="font-size:12px;color:#555;">Chofer: ' + (v.driver || 'Sin chofer') + '</div>' +
+                        '<div style="font-size:12px;color:' + vColor + ';font-weight:700;">● Ocupación: ' + (v.occupancy || '') + '</div>' +
                         '</div>'
                     );
                 markersRef.current.push(marker);
@@ -430,7 +430,7 @@ var MapComponent = function() {
                 }).addTo(mapRef.current);
                 circle.bindPopup(
                     '<div style="font-family:\'DM Sans\',sans-serif;padding:4px 0;">' +
-                    '<div style="font-weight:800;font-size:14px;margin-bottom:4px;">⚠️ ' + z.name + '</div>' +
+                    '<div style="font-weight:800;font-size:14px;margin-bottom:4px;">⚠ Área: ' + z.name + '</div>' +
                     '<div style="color:' + riskColor + ';font-weight:700;font-size:12px;">Riesgo ' + z.risk + '</div>' +
                     '<div style="font-size:11px;color:#888;margin-top:2px;">' + z.incidents + ' incidente' + (z.incidents !== 1 ? 's' : '') + '</div>' +
                     '</div>'
@@ -513,7 +513,7 @@ var MapComponent = function() {
                 }) : [];
                 activeOnRoute.forEach(function(v) {
                     var vColor = OCCUPANCY_COLORS[v.occupancy] || '#8899bb';
-                    var vIcon = TYPE_ICONS[v.type] || '🚌';
+                    var vIcon = TYPE_ICONS[v.type] || DEFAULT_ICON;
                     var vm = window.L.divIcon({
                         className: '',
                         html: '<div style="background:' + vColor + ';border:3px solid #fff;width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 0 0 3px ' + lineColor + ', 0 3px 14px rgba(0,0,0,.3);">' + vIcon + '</div>',
@@ -522,7 +522,7 @@ var MapComponent = function() {
                     });
                     var vmarker = window.L.marker([v.lat, v.lng], { icon: vm })
                         .addTo(mapRef.current)
-                        .bindPopup('<b>' + v.type + ' ' + v.id + '</b><br>👤 ' + v.driver + '<br>● ' + v.occupancy + ' · ' + (v.passengers ? v.passengers.length : 0) + ' a bordo');
+                        .bindPopup('<b>' + v.type + ' ' + v.id + '</b><br>Chofer: ' + v.driver + '<br>● ' + v.occupancy + ' · ' + (v.passengers ? v.passengers.length : 0) + ' a bordo');
                     routeLinesRef.current.push(vmarker);
                 });
             } catch (err) {}
@@ -682,8 +682,8 @@ var MapComponent = function() {
 
     // ── Banner de modo planificador ────────────────────────────────
     var plannerBannerText = '';
-    if (plannerMode === 'picking-origin') plannerBannerText = '📍 Toca el mapa para marcar el ORIGEN';
-    if (plannerMode === 'picking-dest') plannerBannerText = '🏁 Toca el mapa para marcar el DESTINO';
+    if (plannerMode === 'picking-origin') plannerBannerText = '● Toca el mapa para marcar el ORIGEN';
+    if (plannerMode === 'picking-dest') plannerBannerText = '◆ Toca el mapa para marcar el DESTINO';
 
     return (
         React.createElement(React.Fragment, null,
@@ -712,7 +712,7 @@ var MapComponent = function() {
                         pointerEvents: 'none'
                     }
                 },
-                '⚠️ Toca el mapa para marcar la zona peligrosa',
+                '⚠ Toca el mapa para marcar la zona peligrosa',
                 React.createElement('br'),
                 React.createElement('button', {
                     onClick: function() {

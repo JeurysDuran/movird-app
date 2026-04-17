@@ -408,7 +408,7 @@ export const AppProvider = ({ children }) => {
                 v;
         }));
         setCurrentUser(prev => ({...prev, onBoard: vehicleId }));
-        showToast('Te montaste 🚌', 'accent');
+        showToast('Te montaste en la ruta', 'accent');
         return true;
     }, [currentUser, vehicles, showToast]);
 

@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
+import { MdAttachMoney, MdTrendingUp, MdTrendingDown } from 'react-icons/md';
 
 // Mini bar chart component using SVG (no external libs needed)
 const BarChart = ({ data, color = 'var(--accent)', label }) => {
@@ -173,7 +174,7 @@ const ProfilePanel = () => {
                             </div>
                             {myTxns.map(t => (
                                 <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderBottom: '1px solid var(--border)' }}>
-                                    <div style={{ fontSize: 16 }}>{isDriver ? '💰' : '💸'}</div>
+                                    <div style={{ fontSize: 16 }}>{isDriver ? <MdTrendingUp /> : <MdTrendingDown />}</div>
                                     <div style={{ flex: 1 }}>
                                         <div style={{ fontSize: 12, fontWeight: 600 }}>{isDriver ? `De: ${t.user}` : `A: ${t.driver}`}</div>
                                         <div style={{ fontSize: 10, color: 'var(--text2)' }}>{t.time}</div>
